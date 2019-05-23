@@ -1,0 +1,13 @@
+server:
+  port: 8001
+
+spring:
+  application:
+    name: microservice-discovery-eureka
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8001/eureka
+    fetch-registry: false
+    register-with-eureka: false
