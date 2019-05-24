@@ -109,7 +109,7 @@ eureka:
 ```
 启动项目，可以发现项目已经被注册进eureka
 
- ![生产者注册进eureka](asserts\生产者注册进eureka.jpg)
+ ![生产者注册进eureka](asserts/生产者注册进eureka.jpg)
 
  完整代码：
 
