@@ -12,7 +12,7 @@ Spring Boot/Spring Cloud应用开发套路
 
 Eureka是Netflix开源的服务发现组件，本身是一个基于REST的服务，包含Server和Client两部分，Spring Cloud将它集成在子项目Spring Cloud Netflix中
 
-### Eureka Server
+### Eureka Server (快速入门)
 遵循开发套路
 
 * 添加依赖
@@ -58,7 +58,7 @@ eureka:
 启动项目,访问http://localhost:8001/
 
 
-### Eureka Client
+### Eureka Client 
 
 ```xml
 <dependency>
@@ -113,6 +113,71 @@ eureka:
 
  完整代码：
 
- [Eureka Server](https://github.com/AmberBar/spring-cloud-study/tree/master/GreenwichSR1/microservice-discovery-eureka)
+ [microservice-discovery-eureka](https://github.com/AmberBar/spring-cloud-study/tree/master/GreenwichSR1/microservice-discovery-eureka)
 
- [Privider User](https://github.com/AmberBar/spring-cloud-study/tree/master/GreenwichSR1/microservice-provide-user)
+ [microservice-provide-user](https://github.com/AmberBar/spring-cloud-study/tree/master/GreenwichSR1/microservice-provide-user)
+
+ ### eureka 深入
+
+Eureka包含两个组件：Eureka Server 和 Eureka Client:
+
+* Eureka Server负责提供服务发现的能力，各个微服务启动时，会向Eureka Server注册自己的信息（例如IP、端口、微服务名称等）
+* Eureka Client是一个Java客户端，可以与EurekaServer交互
+* client启动后，会周期性的像server发送心跳，默认情况下 `30s`,如果server在一定时间内没有收到client的心跳，那么server会注销实例`90s`
+* Eureka Server遵循CAP原则，符合AP。eureka集群中每个节点之间都是平等状态。如果一个节点宕机，不会进行选举。因此可以很有效的保证可用性
+
+#### 搭建erueka集群
+在host中添加 
+127.0.0.1 peer1 peer2
+可以再`microservice-discovery-eureka` 的基础上修改`application.yml`
+
+```yml
+spring:
+  application:
+    name: microservice-discovery-eureka-cluster
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://peer2:8002/eureka/,http://peer1:8003/eureka/
+---
+spring:
+  profiles: peer1
+server:
+  port: 8002
+eureka:
+  instance:
+    hostname: peer1
+---
+spring:
+  profiles: peer2
+server:
+  port: 8003
+eureka:
+  instance:
+    hostname: peer2
+```
+修改`microservice-provide-user`的`application.yml`
+```yml
+server:
+  port: 9002
+spring:
+  application:
+    name: microservice-provide-user
+  datasource:
+    driverClassName: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/cloud-study?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&useSSL=false&allowMultiQueries=true
+    username: root
+    password: root
+    jpa:
+      show-sql: true
+eureka:
+  client:
+    service-url:
+      defaultZone: http://peer1:8002/eureka/,http://peer2:8003/eureka/
+  instance:
+    prefer-ip-address: true
+
+```
+
+启动服务
+ ![eureka集群](asserts\eureka集群.jpg)

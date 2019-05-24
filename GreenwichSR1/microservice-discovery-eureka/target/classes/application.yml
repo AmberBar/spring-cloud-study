@@ -8,6 +8,9 @@ spring:
 eureka:
   client:
     service-url:
+      #erueka server的地址，记住/eureka不要掉了
       defaultZone: http://localhost:8001/eureka
+    # 是否从eureka server注册，这里我们选择false
     fetch-registry: false
+    # 是否从eureka server 中拉取服务
     register-with-eureka: false

@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: microservice-discovery-eureka-cluster
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://peer2:8002/eureka/,http://peer1:8003/eureka/
+---
+spring:
+  profiles: peer1
+server:
+  port: 8002
+eureka:
+  instance:
+    hostname: peer1
+---
+spring:
+  profiles: peer2
+server:
+  port: 8003
+eureka:
+  instance:
+    hostname: peer2
