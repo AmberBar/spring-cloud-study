@@ -1,0 +1,10 @@
+server:
+  port: 7001
+spring:
+  application:
+    name: microservice-consumer-ribbon
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://peer1:8001/eureka/
