@@ -181,3 +181,87 @@ eureka:
 
 启动服务
  ![eureka集群](asserts/eureka集群.jpg)
+
+## Ribbon 负载均衡器
+Ribbon是Netflix提供的负载均衡器, 只需要为Ribbon提供服务提供者地址，Ribbon就会根据一定的算法调用相应服务，从而达到负载均衡，比如 随机，轮询等。
+
+创建微服务 `microservice-consumer-ribbon`
+
+* 添加依赖
+因为`spring-cloud-starter-netflix-eureka-client`依赖已经包含了ribbon，因此这里只需要引入`spring-cloud-starter-netflix-eureka-client`
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+</dependency>
+```
+* 写注解
+
+`RibbonApplication.java`
+```java
+@SpringBootApplication
+@EnableDiscoveryClient
+public class RibbonApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(RibbonApplication.class, args);
+    }
+}
+
+```
+
+* 写配置
+配置主要是把ribbon注册进eureka server中
+```yml
+server:
+  port: 7001
+spring:
+  application:
+    name: microservice-consumer-ribbon
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://peer1:8001/eureka/
+```
+
+通过以上步骤就可以把ribbon注册进eureka,其实和`microservice-provide-user`注册进eureka server的写法并没有什么差别。
+
+Ribbon既然是负载均衡器，那么如何来实现呢？
+Ribbon是作为客户端的负载均衡器
+
+```java
+@Configuration
+public class RestTemplateConfig {
+
+    @Bean
+    @LoadBalanced
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+}
+
+```
+```java
+@RestController
+public class RibbonController {
+
+    @Autowired
+    RestTemplate restTemplate;
+
+    @GetMapping("/users/{id}")
+    public User findById(@PathVariable Long id) {
+        User user = restTemplate.getForObject(
+                "http://microservice-provider-user/users/{id}", User.class,id
+        );
+        return user; 
+    }
+}
+```
+microservice-provider-user 对应着`microservice-provider-user`(被调用方yml中的spring.application.name值)
+
+修改`microservice-provider-user`的端口，同时启动两个`microservice-provider-user`服务
+连续访问 `http://localhost:7001/users/2` 
+观察两个`microservice-provider-user`服务的后台，可以很明确的看到`microservice-provider-user`两个服务被分表调用了一次。由此可知Ribbon算法默认是轮询
+
+

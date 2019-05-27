@@ -9,10 +9,13 @@
     <packaging>pom</packaging>
     <version>1.0.0-SNAPSHOT</version>
     <modules>
-        <module>microservice-provide-user</module>
         <module>microservice-discovery-eureka-cluster</module>
         <module>microservice-provide-user-cluster</module>
         <module>microservice-discovery-eureka</module>
+        <module>microservice-consumer-movie-ribbon</module>
+        <module>microservice-common</module>
+        <module>microservice-provider-user-1</module>
+        <module>microservice-provider-user</module>
     </modules>
 
     <!-- 引入spring boot的依赖 -->

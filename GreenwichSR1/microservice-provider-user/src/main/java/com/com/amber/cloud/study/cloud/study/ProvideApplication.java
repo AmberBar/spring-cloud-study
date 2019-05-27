@@ -1,14 +1,12 @@
-package com.amber.cloud.study;
+package com.com.amber.cloud.study.cloud.study;
 
-import com.amber.cloud.study.bean.User;
-import com.amber.cloud.study.repository.UserRepository;
+import com.com.amber.cloud.study.cloud.study.bean.User;
+import com.com.amber.cloud.study.cloud.study.repository.UserRepository;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.Bean;
-
-import java.math.BigDecimal;
 import java.util.stream.Stream;
 
 @SpringBootApplication
