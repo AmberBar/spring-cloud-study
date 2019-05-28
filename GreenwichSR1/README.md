@@ -185,6 +185,8 @@ eureka:
 ## Ribbon 负载均衡器
 Ribbon是Netflix提供的负载均衡器, 只需要为Ribbon提供服务提供者地址，Ribbon就会根据一定的算法调用相应服务，从而达到负载均衡，比如 随机，轮询等。
 
+Spring Cloud Ribbon 是基于Netflix Ribbn实现的一套客户端负载均衡的工具。客户端我的理解是，把选择压力放在了客户端，比如现实生活中的排队点餐
+
 创建微服务 `microservice-consumer-ribbon`
 
 * 添加依赖
@@ -263,5 +265,36 @@ microservice-provider-user 对应着`microservice-provider-user`(被调用方yml
 修改`microservice-provider-user`的端口，同时启动两个`microservice-provider-user`服务
 连续访问 `http://localhost:7001/users/2` 
 观察两个`microservice-provider-user`服务的后台，可以很明确的看到`microservice-provider-user`两个服务被分表调用了一次。由此可知Ribbon算法默认是轮询
+
+Ribbon常见的加权策略有：
+
+* 随机 (Random)
+* 轮询 (RoundRobin)
+* 一致性哈希 (ConsistentHash)
+* 哈希 (Hash)
+* 加权（Weighted）
+
+如果希望采用其它策略，实现IRule，如：
+
+```java
+@Bean
+public IRule ribbonRule() {
+    return new BestAvailableRule();
+}
+```
+
+|策略|说明|
+|-|-|
+| RandomRule()| 随机|
+| RoundRobinRule()|轮询 |
+|BestAvailableRule()|并找出并发请求数最小的一个 |
+|WeightedResponseTimeRule()|对RoundRobinRule的扩展，增加了根据实例的运行情况来计算权重，并根据权重来挑选实例，以达到更优的分配效果|
+
+
+[自定义Ribbon策略](https://www.cnblogs.com/amberbar/p/10106361.html)
+
+[microservice-consumer-ribbon 代码](https://github.com/AmberBar/spring-cloud-study/tree/master/GreenwichSR1/microservice-consumer-ribbon)
+
+
 
 
