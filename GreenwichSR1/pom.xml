@@ -15,6 +15,7 @@
         <module>microservice-consumer-ribbon</module>
         <module>microservice-common</module>
         <module>microservice-provider-user</module>
+        <module>microservice-consumer-feign</module>
     </modules>
 
     <!-- 引入spring boot的依赖 -->

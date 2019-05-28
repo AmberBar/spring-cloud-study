@@ -183,11 +183,14 @@ eureka:
  ![eureka集群](asserts/eureka集群.jpg)
 
 ## Ribbon 负载均衡器
+
 Ribbon是Netflix提供的负载均衡器, 只需要为Ribbon提供服务提供者地址，Ribbon就会根据一定的算法调用相应服务，从而达到负载均衡，比如 随机，轮询等。
 
 Spring Cloud Ribbon 是基于Netflix Ribbn实现的一套客户端负载均衡的工具。客户端我的理解是，把选择压力放在了客户端，比如现实生活中的排队点餐
 
 创建微服务 `microservice-consumer-ribbon`
+
+### Quick Start
 
 * 添加依赖
 因为`spring-cloud-starter-netflix-eureka-client`依赖已经包含了ribbon，因此这里只需要引入`spring-cloud-starter-netflix-eureka-client`
@@ -296,5 +299,104 @@ public IRule ribbonRule() {
 [microservice-consumer-ribbon 代码](https://github.com/AmberBar/spring-cloud-study/tree/master/GreenwichSR1/microservice-consumer-ribbon)
 
 
+## Feign
+
+在学习完Ribbon的时候，可以发现一个问题，那就是假设需要调用的url十分的复杂，那么我们的代码可读性就会降低。
+开发者很难一眼看出api具体是需要做什么功能。使用Feign可以帮助我们解决这个问题
+
+[Feign github 地址](https://github.com/OpenFeign/feign)
+
+Feign是netflix开发的声明式的`http客户端`，Feign可帮助我们更加便捷、优雅地调用`HTTP API`。在Spring Cloud中对Feign进行了增强，支持Spring MVC注解。并且Feign中整合了Ribbon
+
+### Quick Start
+
+* 添加依赖
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-openfeign</artifactId>
+</dependency>
+```
+* 添加注解
+```java
+@SpringBootApplication
+@EnableDiscoveryClient
+@EnableFeignClients
+public class FeignApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(FeignApplication.class, args);
+    }
+}
+
+```
+
+* 添加配置
+```yml
+server:
+  port: 7002
+spring:
+  application:
+    name: microservice-consumer-feign
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://peer1:8001/eureka/
+
+```
+
+* 编写`Feign client`
+```java
+@FeignClient(name = "MICROSERVICE-PROVIDER-USER")
+public interface UserFeignClient {
+
+    @GetMapping("/users/{id}")
+    User findById(@PathVariable("id") Long id);
+}
+
+```
+`@FeignClient`注解中的name对应着请求服务的名称`spring.application.name`
+
+`@GetMapping`对应着`MICROSERVICE-PROVIDER-USER`中调用API的地址
+
+[microservice-consumer-feign 代码](https://github.com/AmberBar/spring-cloud-study/tree/master/GreenwichSR1/microservice-consumer-feign)
+
+### Feign 小知识
+
+`Feign`是不是还比较简单捏，是不是所有情况下`Feign`都比`RestTemplate`好呢？并不是，`RestTempalte`的性能高于`Feign`。所以需要根据具体的业务权衡利弊
 
 
+
+### 开启Feign日志
+
+`Feign`有四种日志级别, 默认`Feign`是不打印任何日志的:
+
+* NONE：性能最佳，适用于生产, 不记录任何日志（默认值）。
+* BASIC：适用于生产环境追踪问题,仅记录请求方法、URL、响应状态代码以及执行时间。
+* HEADERS：记录BASIC级别的基础上，记录请求和响应的header。
+* FULL：比较适用于开发及测试环境定位问题, 记录请求和响应的header、body和元数据
+
+在`application.yml`添加
+```yml
+feign:
+  client:
+    config:
+      # 调用的服务名
+      microservice-provider-user: 
+        loggerLevel: full
+#       全局配置
+#      default:
+#        connectTimeout: 5000
+#        readTimeout: 5000
+#        loggerLevel: basic
+logging:
+  level:
+    com.amber.cloud.study.ribbon.feign.UserFeignClient: debug
+
+```
