@@ -1,0 +1,27 @@
+server:
+  port: 7002
+spring:
+  application:
+    name: microservice-consumer-feign-Hystrix
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://peer1:8001/eureka/
+
+feign:
+  hystrix:
+    enabled: true
+  client:
+    config:
+      # 指定服务配置
+      microservice-provider-user:
+        loggerLevel: full
+#       全局配置
+#      default:
+#        connectTimeout: 5000
+#        readTimeout: 5000
+#        loggerLevel: basic
+logging:
+  level:
+    com.amber.cloud.study.ribbon.feign.UserFeignClient: debug

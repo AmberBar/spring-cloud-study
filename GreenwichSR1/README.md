@@ -530,4 +530,64 @@ Response
 * [Hystix github地址](https://github.com/Netflix/Hystrix)
 * [Hystix 在spring cloud中的介绍](https://cloud.spring.io/spring-cloud-static/Greenwich.SR1/single/spring-cloud.html#_circuit_breaker_hystrix_clients)
 
+### Feign + Hystrix
+
+在`microservice-consumer-feign`的基础上修改：
+
+* 启动类添加: `@EnableCircuitBreaker`
+* 修改`UserFeignClient`
+
+```java
+@FeignClient(name = "microservice-provider-user", fallback  = UserFeignHystixClient.class)
+public interface UserFeignClient {
+
+    @GetMapping("/users/{id}")
+    User findById(@PathVariable("id") Long id);
+}
+
+```
+* 编写`UserFeignHystixClient`
+
+```java
+@Component
+public class UserFeignHystixClient implements UserFeignClient {
+
+    @Override
+    public User findById(Long id) {
+        return new User(4L, "nick", "nick", 18);
+    }
+}
+```
+* 开启hystrix,修改application.yml
+
+```yml
+feign:
+  hystrix:
+    enabled: true
+```
+
+* 测试结果
+
+Request: http://localhost:7002/users/1
+```json
+{
+    "id": 1,
+    "username": "account1",
+    "name": "amber",
+    "age": 20
+}
+```
+手动停止`microservice-provider-user`
+
+Request: http://localhost:7002/users/1
+```json
+{
+    "id": 4,
+    "username": "nick",
+    "name": "nick",
+    "age": 18
+}
+```
+Response: 
+ [microservice-consumer-feign-Hystrix github 地址](https://github.com/AmberBar/spring-cloud-study/tree/master/GreenwichSR1/microservice-consumer-feign-Hystrix)
 

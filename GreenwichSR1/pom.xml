@@ -17,6 +17,7 @@
         <module>microservice-provider-user</module>
         <module>microservice-consumer-feign</module>
         <module>microservice-consumer-Hystrix</module>
+        <module>microservice-consumer-feign-Hystrix</module>
     </modules>
 
     <!-- 引入spring boot的依赖 -->
