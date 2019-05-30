@@ -588,6 +588,61 @@ Request: http://localhost:7002/users/1
     "age": 18
 }
 ```
-Response: 
  [microservice-consumer-feign-Hystrix github 地址](https://github.com/AmberBar/spring-cloud-study/tree/master/GreenwichSR1/microservice-consumer-feign-Hystrix)
+
+## Hystrix Dashboard
+
+Hystrix-dashboard是一款针对Hystrix进行实时监控的工具，通过Hystrix Dashboard我们可以在直观地看到各Hystrix Command的请求响应时间, 请求成功率等数据
+
+在 `microservice-consumer-feign-Hystrix`的基础上修改添加
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-hystrix-dashboard</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
+```
+也就是要开启hystrix监控，应该具备以下三个依赖
+
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-hystrix-dashboard</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
+```
+启动类添加`@EnableHystrixDashboard`
+```java
+@SpringBootApplication
+@EnableDiscoveryClient
+@EnableFeignClients
+@EnableHystrixDashboard
+@EnableCircuitBreaker
+public class FeignHystrixApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(FeignHystrixApplication.class, args);
+    }
+}
+```
+
+启动项目，访问`http://127.0.0.1:7002/hystrix`输入要查看的服务`http://127.0.0.1:7002/actuator/hystrix.stream `
+并点击Monitor Stream,就可以看到了
+
+![hystrix-dashboard首页.jpg](asserts/hystrix-dashboard首页.jpg)
+![hystrix_dashboard_监控详情.jpg](asserts/hystrix_dashboard_监控详情.jpg)
+
+ [microservice-consumer-feign-Hystrix-dashboard github 代码](https://github.com/AmberBar/spring-cloud-study/tree/master/GreenwichSR1/microservice-consumer-feign-Hystrix-dashboard)
 
