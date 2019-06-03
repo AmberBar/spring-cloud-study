@@ -19,6 +19,9 @@
         <module>microservice-consumer-Hystrix</module>
         <module>microservice-consumer-feign-Hystrix</module>
         <module>microservice-consumer-feign-Hystrix-dashboard</module>
+        <module>microservice-consumer-turbine</module>
+        <module>microservice-config-Server</module>
+        <module>microservice-config-client</module>
     </modules>
 
     <!-- 引入spring boot的依赖 -->

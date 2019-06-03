@@ -1,0 +1,14 @@
+spring:
+  cloud:
+    config:
+      name: microservice-config
+      profile: pro            # profile对应config server所获取的配置文件中的{profile}
+      label: master           # 指定Git仓库的分支，对应config server所获取的配置文件的{label}
+      discovery:
+        enabled: true
+        serviceId:  microservice-config-server
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://peer:8001/eureka

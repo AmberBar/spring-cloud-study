@@ -646,3 +646,153 @@ public class FeignHystrixApplication {
 
  [microservice-consumer-feign-Hystrix-dashboard github 代码](https://github.com/AmberBar/spring-cloud-study/tree/master/GreenwichSR1/microservice-consumer-feign-Hystrix-dashboard)
 
+## Turbine
+
+但是只使用Hystrix Dashboard的话, 只能看到单个应用内的服务信息。显然在现实生活中，我们常常需要同时关注多个服务的运行情况。
+Turbine可以帮助我们汇总系统内多个服务的数据并显示到Hystrix Dashboard上
+在复杂的分布式系统中，相同服务的节点经常需要部署上百甚至上千个，很多时候，运维人员希望能够把相同服务的节点状态以一个整体集群的形式展现出来，这样可以更好的把握整个系统的状态。 为此，Netflix提供了一个开源项目（Turbine）来提供把多个hystrix.stream的内容聚合为一个数据源供Dashboard展示。
+
+待更...
+
+
+## Config 配置中心
+
+微服务数量随着业务逐渐增多，系统配置页逐渐增多，一个配置属性的修改可能会影响到其他的服务。因此如何高效的管理服务配置文件，是一个重点。
+`spring cloud config`是一个高效的C/S配置中心
+
+`Spring Cloud Config` 可以做什么
+
+* 提供服务端和客户端支持
+* 集中管理各环境的配置文件
+* 配置文件修改之后，可以快速的生效，无需重启项目
+* 可以进行版本管理
+
+### Quick Start
+
+* 编写 `microservice-config-server`
+
+添加依赖
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-config-server</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+</dependency>
+```
+
+```java
+package com.amber.cloud.study;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.config.server.EnableConfigServer;
+
+@SpringBootApplication
+@EnableConfigServer
+@EnableDiscoveryClient
+public class ConfigApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(ConfigApplication.class, args);
+    }
+}
+
+```
+
+```yml
+server:
+  port: 7006
+spring:
+  application:
+    name: microservice-config-server
+  cloud:
+    config:
+      server:
+        git:
+          uri: git@github.com:AmberBar/spring-cloud-study.git  # 配置git仓库的地址
+          search-paths: GreenwichSR1/config-repository       # git仓库地址下的相对地址，可以配置多个，用,分割。
+          username:                                           # git仓库的账号
+          password:
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://peer:8001/eureka
+
+```
+
+
+* 编写 `microservice-config-client`
+
+```xml
+
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-config-client</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+</dependency>
+```
+
+bootstrap.yml
+```yml
+spring:
+  cloud:
+    config:
+      name: microservice-config
+      profile: pro            # profile对应config server所获取的配置文件中的{profile}
+      label: master           # 指定Git仓库的分支，对应config server所获取的配置文件的{label}
+      discovery:
+        enabled: true
+        serviceId:  microservice-config-server
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://peer:8001/eureka
+```
+
+application.yml
+```yml
+server:
+  port: 7007
+
+spring:
+  application:
+    name: microservice-config-client
+```
+
+```java
+package com.amber.cloud.study;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+
+@SpringBootApplication
+@EnableDiscoveryClient
+public class ConfigClientApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(ConfigClientApplication.class, args);
+    }
+}
+
+```
+
+#### 测试结果
+
+启动`microservice-config-server`、`microservice-config-client`、`microservice-config-server`
+
+访问`http://127.0.0.1:7007/hello`
+
+```json
+this is pro
+```
