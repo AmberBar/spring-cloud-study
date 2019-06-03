@@ -669,6 +669,18 @@ Turbine可以帮助我们汇总系统内多个服务的数据并显示到Hystrix
 
 ### Quick Start
 
+* 创建文件夹`config-repository`
+  
+  添加两个文件
+  microservice-config-dev.yml
+  ```yml
+  hello: this is dev
+  ```
+  microservice-config-pro.yml
+  ```yml
+  hello: this is pro
+  ```
+
 * 编写 `microservice-config-server`
 
 添加依赖
@@ -796,3 +808,16 @@ public class ConfigClientApplication {
 ```json
 this is pro
 ```
+
+### config refresh
+
+上面我们说到配置文件修改之后，可以快速的生效，无需重启项目。接下来我们就来修改一下`microservice-config-pro.yml`文件，
+修改过后
+
+```yml
+hello: this is pro2
+```
+
+提交git，并访问`http://127.0.0.1:7007/hello`
+
+获得的结果依旧是`this is pro`这与我们的预期`this is pro2`不相符，这是为什么呢？因为`microservice-config-client`感知不到配置文件的修改，那么这个时候我们应该通过某种方式告知`microservice-config-client`配置文件修改了，你应该重新获得文件内容
