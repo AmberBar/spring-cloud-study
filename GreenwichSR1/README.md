@@ -808,6 +808,11 @@ public class ConfigClientApplication {
 ```json
 this is pro
 ```
+ 完整代码：
+
+ [microservice-config-client](https://github.com/AmberBar/spring-cloud-study/tree/master/GreenwichSR1/microservice-config-client)
+
+[microservice-config-server](https://github.com/AmberBar/spring-cloud-study/tree/master/GreenwichSR1/microservice-config-server)
 
 ### config refresh
 
@@ -852,3 +857,9 @@ public class HelloController {
 * 修改`microservice-config-pro.yml`内容为`this is pro  modify config 1`，并提交git
 * POST: `http://127.0.0.1:7007/actuator/refresh` 触发刷新
 * 访问`http://127.0.0.1:7007/hello`，可以看到已经访问到最新配置了`this is pro  modify config 1`
+
+ 完整代码：
+
+ [microservice-config-client-refresh](https://github.com/AmberBar/spring-cloud-study/tree/master/GreenwichSR1/microservice-config-client-refresh)
+
+ 
