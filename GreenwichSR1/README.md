@@ -821,3 +821,34 @@ hello: this is pro2
 提交git，并访问`http://127.0.0.1:7007/hello`
 
 获得的结果依旧是`this is pro`这与我们的预期`this is pro2`不相符，这是为什么呢？因为`microservice-config-client`感知不到配置文件的修改，那么这个时候我们应该通过某种方式告知`microservice-config-client`配置文件修改了，你应该重新获得文件内容
+
+修改`bootstrap.yml`，添加
+```yml
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*" #打开全部请求端点
+```
+修改`HelloController.java`添加`@RefreshScope`使用该注解的类，会在接到SpringCloud配置中心配置刷新的时候，自动将新的配置更新到该类对应的字段中。
+
+```java
+@RequestMapping("/hello")
+@RestController
+@RefreshScope//使用该注解的类，会在接到SpringCloud配置中心配置刷新的时候，自动将新的配置更新到该类对应的字段中。
+public class HelloController {
+
+    @Value("${hello}")
+    String helloValue;
+
+    @GetMapping
+    public String sayHello() {
+        return helloValue;
+    }
+}
+
+```
+
+* 修改`microservice-config-pro.yml`内容为`this is pro  modify config 1`，并提交git
+* POST: `http://127.0.0.1:7007/actuator/refresh` 触发刷新
+* 访问`http://127.0.0.1:7007/hello`，可以看到已经访问到最新配置了`this is pro  modify config 1`
